@@ -43,4 +43,4 @@ jobs:
             docker pull ivsantander/backend:latest
             docker stop backend || true
             docker rm backend || true
-            docker run -d --name backend -p 3000:3000 -e DB_HOST=10.0.129.87 -e DB_PORT=3306 -e DB_USER=admin -e DB_PASSWORD=password123 -e DB_NAME=proyecto_db -e PORT=3000 ivsantander/backend:latest
+            docker run -d --restart always --name backend -p 3000:3000 -e DB_HOST=10.0.129.87 -e DB_PORT=3306 -e DB_USER=admin -e DB_PASSWORD=password123 -e DB_NAME=proyecto_db -e PORT=3000 ivsantander/backend:latest
