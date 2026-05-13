@@ -39,7 +39,7 @@ jobs:
           proxy_username: ec2-user
           proxy_key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            ssh -i ~/key-evaluacion.pem ec2-user@ip-10-0-128-169.ec2.internal << 'EOF'
+            ssh -i ~/innovatech-key.pem ec2-user@ip-10-0-128-169.ec2.internal << 'EOF'
             docker pull ivsantander/backend:latest
             docker stop backend || true
             docker rm backend || true
