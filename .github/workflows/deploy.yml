@@ -33,13 +33,13 @@ jobs:
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           proxy_host: ${{ secrets.EC2_HOST }}
-          proxy_username: ec2-user
+          proxy_username: ${{ secrets.EC2_USER }}
           proxy_key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            ssh -i ~/innovatech-key.pem ec2-user@ip-10-0-128-169.ec2.internal << 'EOF'
+            ssh -i ~/innovatech-key.pem ${{ secrets.EC2_USER }}@ip-10-0-128-169.ec2.internal << 'EOF'
             docker pull ivsantander/backend:latest
             docker stop backend || true
             docker rm backend || true
