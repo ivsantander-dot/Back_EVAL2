@@ -37,3 +37,6 @@ USER appuser
 
 # Puerto que expone el servicio (ajusta al tuyo)
 EXPOSE 3000
+
+# Comando de inicio
+CMD ["node", "src/index.js"]
