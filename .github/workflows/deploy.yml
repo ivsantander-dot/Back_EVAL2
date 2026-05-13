@@ -1,0 +1,56 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ deploy ]      # se activa solo cuando haces push a la rama deploy
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Descarga el código del repo
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # 2. Inicia sesión en Docker Hub con los secrets
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. Construye la imagen y la sube a Docker Hub
+      - name: Build y push imagen
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ivsantander/backend:latest
+
+      # 4. Se conecta a la EC2 del frontend y salta al backend
+      - name: Deploy en EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          proxy_host: ${{ secrets.EC2_HOST }}
+          proxy_username: ec2-user
+          proxy_key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            ssh -i ~/key-evaluacion.pem ec2-user@ip-10-0-128-169.ec2.internal << 'EOF'
+            docker pull ivsantander/backend:latest
+            docker stop backend || true
+            docker rm backend || true
+            docker run -d \
+              --name backend \
+              -p 3000:3000 \
+              -e DB_HOST=ip-10-0-128-169.ec2.internal \
+              -e DB_PORT=3306 \
+              -e DB_USER=admin \
+              -e DB_PASSWORD=password123 \
+              -e DB_NAME=proyecto_db \
+              -e PORT=3000 \
+              ivsantander/backend:latest
+            EOF
